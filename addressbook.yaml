@@ -1,0 +1,43 @@
+#####################################
+# 2018 ithome ironman
+# Author: James Lu
+# Topic: k8s 不自賞 - Day 26 部署多階層應用：簡易通訊錄 SAB
+# Url: https://ithelp.ithome.com.tw/articles/10195946
+# Licence: MIT
+#####################################
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: address-book
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels: 
+        app: address-book
+    spec:
+      containers:
+      - name: address-book
+        image: jlptf/addressbook
+        imagePullPolicy: Always
+        env:
+        - name: SERVER_PORT
+          value: "80"
+        - name: DB_SERVER
+          value: "mongodb-svc"
+        ports:
+        - containerPort: 80
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: addressbook-svc
+spec:
+  type: NodePort
+  selector:
+    app: address-book
+  ports:
+    - protocol: TCP
+      port: 80
